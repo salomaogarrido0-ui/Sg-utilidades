@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Futebol de Botão</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  color: #1e3c72;
+  margin-bottom: 30px;
+  font-size: 32px;
+}
+
+.placar {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40px;
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.time {
+  text-align: center;
+  flex: 1;
+}
+
+.time h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.pontos {
+  font-size: 48px;
+  font-weight: bold;
+  color: #2a5298;
+}
+
+.campo {
+  background: linear-gradient(180deg, #2d5016, #3a6b1f);
+  border: 4px solid white;
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 30px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Linhas do campo */
+.campo::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: white;
+  left: 50%;
+  top: 0;
+  transform: translateX(-1px);
+}
+
+.campo::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: white;
+  top: 50%;
+  left: 0;
+  transform: translateY(-1px);
+}
+
+/* Bola */
+.bola {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  cursor: move;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  transition: all 0.05s;
+}
+
+.bola:hover {
+  transform: scale(1.2);
+}
+
+.bola.movimento {
+  animation: rotacao 0.5s infinite;
+}
+
+@keyframes rotacao {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+}
+
+/* Botões dos times */
+.time-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.botao-jogador {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+.botao-jogador:hover {
+  transform: scale(1.1);
+}
+
+.botao-jogador:active {
+  transform: scale(0.95);
+}
+
+/* Time 1 (Azul) */
+.time1 {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  border: 3px solid #fff;
+}
+
+.time1:hover {
+  background: linear-gradient(135deg, #264b8b, #3364b5);
+}
+
+/* Time 2 (Vermelho) */
+.time2 {
+  background: linear-gradient(135deg, #c41e3a, #ff0000);
+  color: white;
+  border: 3px solid #fff;
+}
+
+.time2:hover {
+  background: linear-gradient(135deg, #d62d48, #ff1a1a);
+}
+
+/* Controles */
+.controles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.btn-primario {
+  background: #2a5298;
+  color: white;
+  grid-column: 1 / -1;
+}
+
+.btn-primario:hover {
+  background: #1e3c72;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+}
+
+.btn-perigo {
+  background: #c41e3a;
+  color: white;
+}
+
+.btn-perigo:hover {
+  background: #a01830;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(196, 30, 58, 0.4);
+}
+
+.btn-sucesso {
+  background: #28a745;
+  color: white;
+}
+
+.btn-sucesso:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Instruções */
+.instrucoes {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #2a5298;
+}
+
+.instrucoes h3 {
+  color: #1e3c72;
+  margin-bottom: 10px;
+}
+
+.instrucoes ol {
+  margin-left: 20px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.instrucoes li {
+  margin-bottom: 8px;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .campo {
+    height: 300px;
+  }
+
+  .placar {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .controles {
+    grid-template-columns: 1fr;
+  }
+
+  .botao-jogador {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+}
+
+/* Efeito de gol */
+@keyframes gol {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.bola.gol {
+  animation: gol 0.6s;
+}
+
+.mensagem-gol {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 30px 50px;
+  border-radius: 10px;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 1000;
+  display: none;
+  text-align: center;
+  animation: fadeInOut 2s;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.mensagem-gol.show {
+  display: block;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>⚽ FUTEBOL DE BOTÃO</h1>
+
+  <div class="placar">
+    <div class="time">
+      <h2>🔵 Time Azul</h2>
+      <div class="pontos" id="placarTime1">0</div>
+    </div>
+    <div class="time">
+      <h2>🔴 Time Vermelho</h2>
+      <div class="pontos" id="placarTime2">0</div>
+    </div>
+  </div>
+
+  <div class="campo" id="campo">
+    <div class="bola" id="bola"></div>
+  </div>
+
+  <div class="controles">
+    <button class="btn-primario" id="novoJogo">🔄 NOVO JOGO</button>
+    <button class="btn-sucesso" id="gerarJogadores">🎮 GERAR JOGADORES</button>
+    <button class="btn-perigo" id="resetarBola">🎯 RESETAR BOLA</button>
+  </div>
+
+  <div class="instrucoes">
+    <h3>📋 Como Jogar:</h3>
+    <ol>
+      <li>Clique em <strong>"GERAR JOGADORES"</strong> para criar os botões dos times</li>
+      <li>Clique nos botões do seu time para chutar a bola</li>
+      <li>Tente empurrar a bola para o gol do adversário (as extremidades do campo)</li>
+      <li>A bola sai do campo = GOL! O placar é atualizado automaticamente</li>
+      <li>Use <strong>"RESETAR BOLA"</strong> para voltar ao centro</li>
+      <li>Use <strong>"NOVO JOGO"</strong> para resetar tudo</li>
+    </ol>
+  </div>
+</div>
+
+<div class="mensagem-gol" id="mensagemGol"></div>
+
+<script>
+class FutebolBotao {
+  constructor() {
+    this.campo = document.getElementById('campo');
+    this.bola = document.getElementById('bola');
+    this.placarTime1 = document.getElementById('placarTime1');
+    this.placarTime2 = document.getElementById('placarTime2');
+    this.mensagemGol = document.getElementById('mensagemGol');
+    
+    this.pontos1 = 0;
+    this.pontos2 = 0;
+    this.bolaX = this.campo.offsetWidth / 2 - 10;
+    this.bolaY = this.campo.offsetHeight / 2 - 10;
+    this.velocidadeX = 0;
+    this.velocidadeY = 0;
+    this.fricao = 0.98;
+    this.jogadores = [];
+    
+    this.posicionarBola();
+    this.iniciarAnimacao();
+    this.configurarEventos();
+  }
+
+  configurarEventos() {
+    document.getElementById('novoJogo').addEventListener('click', () => this.novoJogo());
+    document.getElementById('gerarJogadores').addEventListener('click', () => this.gerarJogadores());
+    document.getElementById('resetarBola').addEventListener('click', () => this.resetarBola());
+  }
+
+  gerarJogadores() {
+    // Limpar jogadores antigos
+    this.jogadores.forEach(j => j.remove());
+    this.jogadores = [];
+
+    const coloresTime1 = ['#1e3c72', '#2a5298'];
+    const coloresTime2 = ['#c41e3a', '#ff0000'];
+
+    // Time 1 (Azul) - Lado esquerdo
+    const posicoes1 = [
+      { x: 50, y: 50 },
+      { x: 80, y: 100 },
+      { x: 50, y: 150 },
+      { x: 80, y: 200 },
+      { x: 50, y: 250 },
+      { x: 80, y: 300 }
+    ];
+
+    // Time 2 (Vermelho) - Lado direito
+    const posicoes2 = [
+      { x: this.campo.offsetWidth - 80, y: 50 },
+      { x: this.campo.offsetWidth - 50, y: 100 },
+      { x: this.campo.offsetWidth - 80, y: 150 },
+      { x: this.campo.offsetWidth - 50, y: 200 },
+      { x: this.campo.offsetWidth - 80, y: 250 },
+      { x: this.campo.offsetWidth - 50, y: 300 }
+    ];
+
+    // Criar botões do Time 1
+    posicoes1.forEach((pos, index) => {
+      const botao = document.createElement('button');
+      botao.className = 'botao-jogador time1';
+      botao.textContent = index + 1;
+      botao.style.left = pos.x + 'px';
+      botao.style.top = pos.y + 'px';
+      botao.addEventListener('click', () => this.chutar(pos.x + 25, pos.y + 25, true));
+      this.campo.appendChild(botao);
+      this.jogadores.push(botao);
+    });
+
+    // Criar botões do Time 2
+    posicoes2.forEach((pos, index) => {
+      const botao = document.createElement('button');
+      botao.className = 'botao-jogador time2';
+      botao.textContent = index + 1;
+      botao.style.left = pos.x + 'px';
+      botao.style.top = pos.y + 'px';
+      botao.addEventListener('click', () => this.chutar(pos.x + 25, pos.y + 25, false));
+      this.campo.appendChild(botao);
+      this.jogadores.push(botao);
+    });
+  }
+
+  chutar(jogarX, jogarY, ehTime1) {
+    // Calcular direção do chute
+    const bolaX = this.bolaX + 10;
+    const bolaY = this.bolaY + 10;
+    
+    const dx = bolaX - jogarX;
+    const dy = bolaY - jogarY;
+    const distancia = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distancia > 0) {
+      const forcaChute = 15;
+      this.velocidadeX = (dx / distancia) * forcaChute;
+      this.velocidadeY = (dy / distancia) * forcaChute;
+    }
+
+    this.bola.classList.add('movimento');
+    setTimeout(() => this.bola.classList.remove('movimento'), 500);
+  }
+
+  posicionarBola() {
+    this.bola.style.left = this.bolaX + 'px';
+    this.bola.style.top = this.bolaY + 'px';
+  }
+
+  resetarBola() {
+    this.bolaX = this.campo.offsetWidth / 2 - 10;
+    this.bolaY = this.campo.offsetHeight / 2 - 10;
+    this.velocidadeX = 0;
+    this.velocidadeY = 0;
+    this.posicionarBola();
+  }
+
+  atualizarFisica() {
+    // Aplicar velocidade
+    this.bolaX += this.velocidadeX;
+    this.bolaY += this.velocidadeY;
+
+    // Aplicar fricção
+    this.velocidadeX *= this.fricao;
+    this.velocidadeY *= this.fricao;
+
+    // Parar movimento muito lento
+    if (Math.abs(this.velocidadeX) < 0.1) this.velocidadeX = 0;
+    if (Math.abs(this.velocidadeY) < 0.1) this.velocidadeY = 0;
+
+    // Colisão com as laterais (gol)
+    if (this.bolaX < -20) {
+      this.marcarGol(2);
+      this.resetarBola();
+    } else if (this.bolaX > this.campo.offsetWidth) {
+      this.marcarGol(1);
+      this.resetarBola();
+    }
+
+    // Colisão com a parte superior e inferior
+    if (this.bolaY < 0) {
+      this.bolaY = 0;
+      this.velocidadeY *= -0.8;
+    } else if (this.bolaY > this.campo.offsetHeight - 20) {
+      this.bolaY = this.campo.offsetHeight - 20;
+      this.velocidadeY *= -0.8;
+    }
+
+    this.posicionarBola();
+  }
+
+  marcarGol(time) {
+    this.bola.classList.add('gol');
+    setTimeout(() => this.bola.classList.remove('gol'), 600);
+
+    if (time === 1) {
+      this.pontos1++;
+      this.mostrarMensagem('⚽ GOL DO TIME AZUL!');
+    } else {
+      this.pontos2++;
+      this.mostrarMensagem('⚽ GOL DO TIME VERMELHO!');
+    }
+
+    this.atualizarPlacar();
+  }
+
+  mostrarMensagem(mensagem) {
+    this.mensagemGol.textContent = mensagem;
+    this.mensagemGol.classList.add('show');
+    setTimeout(() => {
+      this.mensagemGol.classList.remove('show');
+    }, 2000);
+  }
+
+  atualizarPlacar() {
+    this.placarTime1.textContent = this.pontos1;
+    this.placarTime2.textContent = this.pontos2;
+  }
+
+  novoJogo() {
+    this.pontos1 = 0;
+    this.pontos2 = 0;
+    this.resetarBola();
+    this.atualizarPlacar();
+    this.gerarJogadores();
+  }
+
+  iniciarAnimacao() {
+    const animar = () => {
+      this.atualizarFisica();
+      requestAnimationFrame(animar);
+    };
+    animar();
+  }
+}
+
+// Iniciar o jogo quando a página carregar
+window.addEventListener('load', () => {
+  new FutebolBotao();
+});
+</script>
+
+</body>
+</html>

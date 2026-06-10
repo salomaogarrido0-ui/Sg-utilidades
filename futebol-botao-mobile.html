@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1e3c72">
+<title>Futebol de Botão Mobile</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 0;
+}
+
+.header {
+  background: linear-gradient(90deg, #004aad, #0077ff);
+  color: white;
+  padding: 8px 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header h1 {
+  font-size: 20px;
+  margin: 0;
+  padding: 5px 0;
+}
+
+.placar-mobile {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 10px;
+  gap: 10px;
+}
+
+.time-placar {
+  text-align: center;
+  color: white;
+  flex: 1;
+}
+
+.time-placar h2 {
+  font-size: 12px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.pontos-mobile {
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1;
+  margin: 5px 0 0 0;
+}
+
+.campo-mobile {
+  background: linear-gradient(180deg, #2d5016, #3a6b1f);
+  border: 3px solid white;
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  margin: 8px;
+  border-radius: 8px;
+}
+
+/* Linhas do campo */
+.campo-mobile::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: white;
+  left: 50%;
+  top: 0;
+  transform: translateX(-1px);
+}
+
+.campo-mobile::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: white;
+  top: 50%;
+  left: 0;
+  transform: translateY(-1px);
+}
+
+/* Bola */
+.bola-mobile {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.bola-mobile.movimento {
+  animation: rotacao 0.5s infinite;
+}
+
+@keyframes rotacao {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+}
+
+/* Botões dos times */
+.botao-time {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  z-index: 5;
+}
+
+.botao-time:active {
+  transform: scale(0.9);
+}
+
+/* Time 1 (Azul) */
+.time-azul {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+}
+
+.time-azul:active {
+  background: linear-gradient(135deg, #264b8b, #3364b5);
+}
+
+/* Time 2 (Vermelho) */
+.time-vermelho {
+  background: linear-gradient(135deg, #c41e3a, #ff0000);
+  color: white;
+}
+
+.time-vermelho:active {
+  background: linear-gradient(135deg, #d62d48, #ff1a1a);
+}
+
+/* Controles */
+.controles-mobile {
+  display: flex;
+  gap: 5px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-mobile {
+  flex: 1;
+  padding: 8px 5px;
+  font-size: 11px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-novo {
+  background: #2a5298;
+}
+
+.btn-novo:active {
+  background: #1e3c72;
+}
+
+.btn-reset {
+  background: #28a745;
+}
+
+.btn-reset:active {
+  background: #218838;
+}
+
+.btn-gerar {
+  background: #ffc107;
+  color: #333;
+}
+
+.btn-gerar:active {
+  background: #ffb300;
+}
+
+/* Mensagem de Gol */
+.mensagem-gol-mobile {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 1000;
+  display: none;
+  text-align: center;
+  animation: fadeInOut 2s;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.mensagem-gol-mobile.show {
+  display: block;
+}
+
+/* Efeito de gol */
+@keyframes gol-mobile {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.bola-mobile.gol {
+  animation: gol-mobile 0.6s;
+}
+
+/* Instruções Rápidas */
+.instrucoes-rapidas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 10px;
+  font-size: 11px;
+  text-align: center;
+  z-index: 999;
+  display: none;
+  line-height: 1.4;
+  max-height: 60px;
+  overflow-y: auto;
+}
+
+.instrucoes-rapidas.show {
+  display: block;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .time-placar h2 {
+    font-size: 11px;
+  }
+
+  .pontos-mobile {
+    font-size: 32px;
+  }
+
+  .botao-time {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .btn-mobile {
+    font-size: 10px;
+    padding: 6px 3px;
+  }
+}
+
+@media (orientation: landscape) {
+  .header {
+    padding: 4px 10px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .placar-mobile {
+    padding: 4px 10px;
+  }
+
+  .time-placar h2 {
+    font-size: 10px;
+  }
+
+  .pontos-mobile {
+    font-size: 28px;
+    margin: 2px 0 0 0;
+  }
+
+  .campo-mobile {
+    margin: 4px;
+  }
+
+  .controles-mobile {
+    padding: 4px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>⚽ FUTEBOL DE BOTÃO</h1>
+</div>
+
+<div class="placar-mobile">
+  <div class="time-placar">
+    <h2>🔵 Azul</h2>
+    <div class="pontos-mobile" id="placarTime1Mobile">0</div>
+  </div>
+  <div class="time-placar">
+    <h2>🔴 Vermelho</h2>
+    <div class="pontos-mobile" id="placarTime2Mobile">0</div>
+  </div>
+</div>
+
+<div class="campo-mobile" id="campoMobile">
+  <div class="bola-mobile" id="bolaMobile"></div>
+</div>
+
+<div class="controles-mobile">
+  <button class="btn-mobile btn-gerar" id="gerarJogadoresMobile">🎮 JOGAR</button>
+  <button class="btn-mobile btn-reset" id="resetarBolaMobile">🎯 RESET</button>
+  <button class="btn-mobile btn-novo" id="novoJogoMobile">🔄 NOVO</button>
+</div>
+
+<div class="mensagem-gol-mobile" id="mensagemGolMobile"></div>
+
+<script>
+class FutebolBotaoMobile {
+  constructor() {
+    this.campo = document.getElementById('campoMobile');
+    this.bola = document.getElementById('bolaMobile');
+    this.placarTime1 = document.getElementById('placarTime1Mobile');
+    this.placarTime2 = document.getElementById('placarTime2Mobile');
+    this.mensagemGol = document.getElementById('mensagemGolMobile');
+    
+    this.pontos1 = 0;
+    this.pontos2 = 0;
+    this.bolaX = this.campo.offsetWidth / 2 - 8;
+    this.bolaY = this.campo.offsetHeight / 2 - 8;
+    this.velocidadeX = 0;
+    this.velocidadeY = 0;
+    this.fricao = 0.97;
+    this.jogadores = [];
+    this.jogandoAtualmente = false;
+    
+    this.posicionarBola();
+    this.iniciarAnimacao();
+    this.configurarEventos();
+    this.gerarJogadores(); // Gerar automaticamente
+  }
+
+  configurarEventos() {
+    document.getElementById('novoJogoMobile').addEventListener('click', () => this.novoJogo());
+    document.getElementById('gerarJogadoresMobile').addEventListener('click', () => this.gerarJogadores());
+    document.getElementById('resetarBolaMobile').addEventListener('click', () => this.resetarBola());
+    
+    // Prevenir scroll
+    document.addEventListener('touchmove', (e) => {
+      if (e.target.closest('.campo-mobile')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
+
+  gerarJogadores() {
+    // Limpar jogadores antigos
+    this.jogadores.forEach(j => j.remove());
+    this.jogadores = [];
+
+    const altoCampo = this.campo.offsetHeight;
+    const larguraCampo = this.campo.offsetWidth;
+
+    // Posições otimizadas para mobile
+    const posicoes1 = [
+      { x: 5, y: altoCampo * 0.15 },
+      { x: 8, y: altoCampo * 0.35 },
+      { x: 5, y: altoCampo * 0.50 },
+      { x: 8, y: altoCampo * 0.65 },
+      { x: 5, y: altoCampo * 0.85 }
+    ];
+
+    const posicoes2 = [
+      { x: larguraCampo - 40, y: altoCampo * 0.15 },
+      { x: larguraCampo - 43, y: altoCampo * 0.35 },
+      { x: larguraCampo - 40, y: altoCampo * 0.50 },
+      { x: larguraCampo - 43, y: altoCampo * 0.65 },
+      { x: larguraCampo - 40, y: altoCampo * 0.85 }
+    ];
+
+    // Time 1 (Azul)
+    posicoes1.forEach((pos, index) => {
+      const botao = document.createElement('button');
+      botao.className = 'botao-time time-azul';
+      botao.textContent = index + 1;
+      botao.style.left = pos.x + 'px';
+      botao.style.top = pos.y + 'px';
+      botao.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.chutar(pos.x + 17.5, pos.y + 17.5, true);
+      });
+      this.campo.appendChild(botao);
+      this.jogadores.push(botao);
+    });
+
+    // Time 2 (Vermelho)
+    posicoes2.forEach((pos, index) => {
+      const botao = document.createElement('button');
+      botao.className = 'botao-time time-vermelho';
+      botao.textContent = index + 1;
+      botao.style.left = pos.x + 'px';
+      botao.style.top = pos.y + 'px';
+      botao.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.chutar(pos.x + 17.5, pos.y + 17.5, false);
+      });
+      this.campo.appendChild(botao);
+      this.jogadores.push(botao);
+    });
+
+    this.jogandoAtualmente = true;
+  }
+
+  chutar(jogarX, jogarY, ehTime1) {
+    const bolaX = this.bolaX + 8;
+    const bolaY = this.bolaY + 8;
+    
+    const dx = bolaX - jogarX;
+    const dy = bolaY - jogarY;
+    const distancia = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distancia > 0) {
+      const forcaChute = 12;
+      this.velocidadeX = (dx / distancia) * forcaChute;
+      this.velocidadeY = (dy / distancia) * forcaChute;
+    }
+
+    this.bola.classList.add('movimento');
+    setTimeout(() => this.bola.classList.remove('movimento'), 500);
+  }
+
+  posicionarBola() {
+    this.bola.style.left = this.bolaX + 'px';
+    this.bola.style.top = this.bolaY + 'px';
+  }
+
+  resetarBola() {
+    this.bolaX = this.campo.offsetWidth / 2 - 8;
+    this.bolaY = this.campo.offsetHeight / 2 - 8;
+    this.velocidadeX = 0;
+    this.velocidadeY = 0;
+    this.posicionarBola();
+  }
+
+  atualizarFisica() {
+    this.bolaX += this.velocidadeX;
+    this.bolaY += this.velocidadeY;
+
+    this.velocidadeX *= this.fricao;
+    this.velocidadeY *= this.fricao;
+
+    if (Math.abs(this.velocidadeX) < 0.1) this.velocidadeX = 0;
+    if (Math.abs(this.velocidadeY) < 0.1) this.velocidadeY = 0;
+
+    // Gol
+    if (this.bolaX < -15) {
+      this.marcarGol(2);
+      this.resetarBola();
+    } else if (this.bolaX > this.campo.offsetWidth) {
+      this.marcarGol(1);
+      this.resetarBola();
+    }
+
+    // Colisões
+    if (this.bolaY < 0) {
+      this.bolaY = 0;
+      this.velocidadeY *= -0.8;
+    } else if (this.bolaY > this.campo.offsetHeight - 16) {
+      this.bolaY = this.campo.offsetHeight - 16;
+      this.velocidadeY *= -0.8;
+    }
+
+    this.posicionarBola();
+  }
+
+  marcarGol(time) {
+    this.bola.classList.add('gol');
+    setTimeout(() => this.bola.classList.remove('gol'), 600);
+
+    if (time === 1) {
+      this.pontos1++;
+      this.mostrarMensagem('⚽ GOL AZUL!');
+    } else {
+      this.pontos2++;
+      this.mostrarMensagem('⚽ GOL VERMELHO!');
+    }
+
+    this.atualizarPlacar();
+  }
+
+  mostrarMensagem(mensagem) {
+    this.mensagemGol.textContent = mensagem;
+    this.mensagemGol.classList.add('show');
+    setTimeout(() => {
+      this.mensagemGol.classList.remove('show');
+    }, 1500);
+  }
+
+  atualizarPlacar() {
+    this.placarTime1.textContent = this.pontos1;
+    this.placarTime2.textContent = this.pontos2;
+  }
+
+  novoJogo() {
+    this.pontos1 = 0;
+    this.pontos2 = 0;
+    this.resetarBola();
+    this.atualizarPlacar();
+    this.gerarJogadores();
+  }
+
+  iniciarAnimacao() {
+    const animar = () => {
+      this.atualizarFisica();
+      requestAnimationFrame(animar);
+    };
+    animar();
+  }
+}
+
+// Iniciar quando carregar
+window.addEventListener('load', () => {
+  new FutebolBotaoMobile();
+});
+
+// Impedir zoom duplo
+document.addEventListener('dblclick', (e) => {
+  e.preventDefault();
+});
+</script>
+
+</body>
+</html>
